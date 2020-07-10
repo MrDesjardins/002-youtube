@@ -9,24 +9,28 @@ import {
   HousesRequest,
   HousesResponse,
 } from "./house_pb";
+import { mapping } from "./mapping";
 const allHouse: House.AsObject[] = [
   {
     id: 1,
     housenumber: "123",
     squarefeet: 1200,
     streetname: "Funny Street",
+    numberofbedrooms: 1,
   },
   {
     id: 2,
     housenumber: "500",
     squarefeet: 2000,
     streetname: "Zoo",
+    numberofbedrooms: 2,
   },
   {
     id: 3,
     housenumber: "67",
     squarefeet: 890,
     streetname: "Spring Cir",
+    numberofbedrooms: 3,
   },
 ];
 class HouseService implements IHouseServiceServer {
@@ -49,11 +53,9 @@ class HouseService implements IHouseServiceServer {
     const request = call.request;
     const house = allHouse.filter((d) => d.id === request.getId()).shift();
     const response = new HouseResponse();
-    const houseGrpc: House = new House();
+    let houseGrpc: House = new House();
     if (house !== undefined) {
-      houseGrpc.setId(house.id);
-      houseGrpc.setStreetname(house.streetname);
-      houseGrpc.setHousenumber(house.housenumber);
+      houseGrpc = mapping.house(house);
     }
     response.setHouse(houseGrpc);
     callback(null, response);
@@ -66,17 +68,10 @@ class HouseService implements IHouseServiceServer {
     const request = call.request;
     const houses = request.getIdList();
     const response = new HousesResponse();
-    const housesObj: House[] = houses
-      .map((d) => allHouse.find((ff) => ff.id === d))
-      .map((h) => {
-        const c = new House();
-        if (h !== undefined) {
-          c.setId(h.id);
-          c.setStreetname(h.streetname);
-          c.setHousenumber(h.housenumber);
-        }
-        return c;
-      });
+    const housesO = houses.map((d) =>
+      allHouse.find((ff) => ff.id === d)
+    ) as House.AsObject[];
+    const housesObj = mapping.houses(housesO);
     response.setHousesList(housesObj);
     callback(null, response);
   }

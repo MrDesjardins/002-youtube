@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "ts-node-dev ./server.ts"
+    "start": "ts-node-dev ./server.ts",
+    "monitor": "nodemon --watch house.proto --exec ./gen.sh"
   },
   "author": "Patrick Desjardins <mrdesjardins@gmail.com>",
   "license": "ISC",
